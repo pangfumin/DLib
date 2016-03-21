@@ -49,7 +49,15 @@ endif(BUILD_DVision)
 
 
 if(BUILD_DUtilsCV OR BUILD_DVision)
-  find_package(OpenCV REQUIRED)
+  find_package(OpenCV 2 REQUIRED core imgproc features2d ml)
+  message(STATUS "opencv libraries found: ${OpenCV_LIBS}")
+  if(OpenCV_VERSION VERSION_LESS "3.0")
+     # use 2.4 modules
+     message(STATUS "Using OpenCV 2.x")
+  else()
+     # use 3.x modules
+     message(STATUS "Using OpenCV 3.x")
+  endif()
 endif(BUILD_DUtilsCV OR BUILD_DVision)
 
 include_directories(include/DUtils include/DUtilsCV include/DVision ${OpenCV_INCLUDE_DIRS})
