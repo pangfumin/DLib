@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(DLib)
+set (PACKAGE_NAME "dlib")
 
 option(BUILD_DUtils   "Build DUtils (basic c++ functions)." ON)
 option(BUILD_DUtilsCV "Build DUtilsCV (OpenCV functions, requires DUtils)." ON)
@@ -64,8 +65,17 @@ include_directories(include/DUtils include/DUtilsCV include/DVision ${OpenCV_INC
 add_library(${PROJECT_NAME} SHARED ${SRCS})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
-configure_file(src/DLib.cmake.in
+set (CONFIG_INSTALL_DIR  ${CMAKE_INSTALL_PREFIX}/share/${PACKAGE_NAME}/cmake)
+
+configure_file(src/DLib.cmake.in 
   "${PROJECT_BINARY_DIR}/DLibConfig.cmake" @ONLY)
+
+message(STATUS "CONFIG_INSTALL_DIR: ${CONFIG_INSTALL_DIR}")
+install (
+   FILES "${PROJECT_BINARY_DIR}/DLibConfig.cmake"
+   RENAME "${PROJECT_BINARY_DIR}/DLibConfig.cmake"
+   DESTINATION ${CONFIG_INSTALL_DIR}
+  )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 if(BUILD_DUtils)
@@ -80,4 +90,7 @@ endif()
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DLibConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})
 install(FILES "${PROJECT_BINARY_DIR}/DLibConfig.cmake" 
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/DLib/)
+  DESTINATION ${CONFIG_INSTALL_DIR})
+
+# Install catkin package.xml
+install(FILES package.xml DESTINATION share/${PACKAGE_NAME}/)
