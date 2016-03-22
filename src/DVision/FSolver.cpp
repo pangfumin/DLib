@@ -11,6 +11,7 @@
 #include <vector>
 #include <cmath>
 #include <opencv/cv.h>
+#include <opencv/ml.h>
 #include "FSolver.h"
 
 #include "DUtils.h"

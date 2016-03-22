@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
-project(DLib)
+project(dlib)
+
+find_package(catkin_simple REQUIRED)
+catkin_simple(ALL_DEPS_REQUIRED)
 
 option(BUILD_DUtils   "Build DUtils (basic c++ functions)." ON)
 option(BUILD_DUtilsCV "Build DUtilsCV (OpenCV functions, requires DUtils)." ON)
@@ -49,27 +52,38 @@ endif(BUILD_DVision)
 
 
 if(BUILD_DUtilsCV OR BUILD_DVision)
-  find_package(OpenCV REQUIRED)
+  find_package(OpenCV 2 REQUIRED core imgproc features2d ml nonfree)
+  message(STATUS "opencv libraries found: ${OpenCV_LIBS}")
+  if(OpenCV_VERSION VERSION_LESS "3.0")
+     # use 2.4 modules
+     message(STATUS "Using OpenCV 2.x")
+  else()
+     # use 3.x modules
+     message(STATUS "Using OpenCV 3.x")
+  endif()
 endif(BUILD_DUtilsCV OR BUILD_DVision)
 
 include_directories(include/DUtils include/DUtilsCV include/DVision ${OpenCV_INCLUDE_DIRS})
-add_library(${PROJECT_NAME} SHARED ${SRCS})
+cs_add_library(${PROJECT_NAME} SHARED ${SRCS})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
-configure_file(src/DLib.cmake.in
-  "${PROJECT_BINARY_DIR}/DLibConfig.cmake" @ONLY)
+# configure_file(src/DLib.cmake.in
+#   "${PROJECT_BINARY_DIR}/DLibConfig.cmake" @ONLY)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-if(BUILD_DUtils)
-  install(DIRECTORY include/DUtils DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-endif()
-if(BUILD_DUtilsCV)
-  install(DIRECTORY include/DUtilsCV DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-endif()
-if(BUILD_DVision)
-  install(DIRECTORY include/DVision DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-endif()
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DLibConfig.cmake"
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})
-install(FILES "${PROJECT_BINARY_DIR}/DLibConfig.cmake" 
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/DLib/)
+# install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+# if(BUILD_DUtils)
+#   install(DIRECTORY include/DUtils DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+# endif()
+# if(BUILD_DUtilsCV)
+#   install(DIRECTORY include/DUtilsCV DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+# endif()
+# if(BUILD_DVision)
+#   install(DIRECTORY include/DVision DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+# endif()
+# install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DLibConfig.cmake"
+#   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})
+# install(FILES "${PROJECT_BINARY_DIR}/DLibConfig.cmake" 
+#   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/DLib/)
+
+cs_install()
+cs_export()
